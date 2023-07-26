@@ -5,8 +5,42 @@ from PyQt5.QtWidgets import *
 import webbrowser
 
 # Dimensions for app size
-_xDim = 720
-_yDim = _xDim
+_xDim = 720 + 1
+_yDim = 720 + 26
+
+"""       TEMP CODES:
+           wr | br
+          wkn | bkn
+           wb | bb
+      wk, wq  |  bk, bq
+           wp | bp
+"""
+
+# Initialize board storage
+_pieceDict = {}
+for i in range(1, 9):
+    _pieceDict["b" + str(i)] = "wp"
+    _pieceDict["g" + str(i)] = "bp"
+    if i == 1 or i == 8:
+        _pieceDict["a" + str(i)] = "wr"
+        _pieceDict["h" + str(i)] = "br"
+    if i == 2 or i == 7:
+        _pieceDict["a" + str(i)] = "wkn"
+        _pieceDict["h" + str(i)] = "bkn"
+    if i == 3 or i == 6:
+        _pieceDict["a" + str(i)] = "wb"
+        _pieceDict["h" + str(i)] = "bb"
+    if i == 4:
+        _pieceDict["a" + str(i)] = "wk"
+        _pieceDict["h" + str(i)] = "bq"
+    if i == 5:
+        _pieceDict["a" + str(i)] = "wq"
+        _pieceDict["h" + str(i)] = "bk"
+    _pieceDict["c" + str(i)] = ""
+    _pieceDict["d" + str(i)] = ""
+    _pieceDict["e" + str(i)] = ""
+    _pieceDict["f" + str(i)] = ""
+
 
 # Colors for board
 _brdClrOne = QColor(207, 138, 70)
@@ -32,19 +66,45 @@ class BoardImage(QWidget):
                 else:
                     selfPainter.fillRect(x, y, squareSize, squareSize, _brdClrTwo)
                 alt = not alt
+                piece = _pieceDict[chr(7 - int(y / squareSize) + 97) + str(int(x / squareSize) + 1)]
+                if piece == "wr":
+                    selfPainter.drawImage(x, y, QImage('./assets/wr.png'))
+                elif piece == "br":
+                    selfPainter.drawImage(x, y, QImage('./assets/br.png'))
+                elif piece == "wkn":
+                    selfPainter.drawImage(x, y, QImage('./assets/wkn.png'))
+                elif piece == "bkn":
+                    selfPainter.drawImage(x, y, QImage('./assets/bkn.png'))
+                elif piece == "wb":
+                    selfPainter.drawImage(x, y, QImage('./assets/wb.png'))
+                elif piece == "bb":
+                    selfPainter.drawImage(x, y, QImage('./assets/bb.png'))
+                elif piece == "wk":
+                    selfPainter.drawImage(x, y, QImage('./assets/wk.png'))
+                elif piece == "bk":
+                    selfPainter.drawImage(x, y, QImage('./assets/bk.png'))
+                elif piece == "wq":
+                    selfPainter.drawImage(x, y, QImage('./assets/wq.png'))
+                elif piece == "bq":
+                    selfPainter.drawImage(x, y, QImage('./assets/bq.png'))
+                elif piece == "wp":
+                    selfPainter.drawImage(x, y, QImage('./assets/wp.png'))
+                elif piece == "bp":
+                    selfPainter.drawImage(x, y, QImage('./assets/bp.png'))
+        selfPainter.drawRect(0, 0, squareSize * 8, squareSize * 8)
 
 # Houses all compenents of the chess gui for the main window
 class WindowLayout(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout()
-        layout.setSpacing(0)
+        layout.setSpacing(-0)
         layout.setContentsMargins(0, 0, 0, 0)
         topLayout = QHBoxLayout()
         topLayout.setSpacing(0)
         topLayout.setContentsMargins(0, 0, 0, 0)
         topLayout.addWidget(BoardImage())
-        topLayout.addWidget(QWidget())
+        topLayout.addWidget(QWidget()) 
         housing = QWidget()
         housing.setLayout(topLayout)
         layout.addWidget(housing)
