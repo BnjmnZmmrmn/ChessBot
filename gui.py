@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import webbrowser
+import datetime
 
 # Dimensions for app size
 _xDim = 720
@@ -48,15 +49,19 @@ _brdClrTwo = QColor(253, 204, 157)
 
 # Class for engine debug console
 class EngineDebug(QFrame):
-    def __init__(self):
+    def __init__(self, engine, diff):
         super().__init__()
+        self.engineName = engine
+        self.diff = diff
         self.setFixedSize(int(_xDim), int(_yDim / 2))
         layout = QVBoxLayout()
         self.setLayout(layout)
         title = self.createTitle()
         layout.addWidget(title)
         self.textBox = QLabel()
+        self.textBox.setIndent(5)
         self.textBox.setStyleSheet("background-color: white;" "border: 2px solid grey;")
+        self.textBox.setAlignment(Qt.AlignTop)
         layout.addWidget(self.textBox)
         self.updateText("Sample")
         self.setLayout(layout)
@@ -65,14 +70,14 @@ class EngineDebug(QFrame):
 
     def updateText(self, debug):
         currText = self.textBox.text()
-        self.textBox.setText(currText + debug)
+        self.textBox.setText(currText + datetime.datetime.now().strftime("%H:%M:%S") + " <" + self.engineName + self.diff + ": " + debug + "\n")
     
     def createTitle(self):
         header = QLabel()
         font = header.font()
         font.setPointSize(10)
         header.setFont(font)
-        header.setText("Engine Debug:")
+        header.setText("Engine Debug")
         header.setFixedHeight(20)
         return header
 
@@ -165,7 +170,7 @@ class WindowLayout(QWidget):
         housing = QWidget()
         housing.setLayout(topLayout)
         layout.addWidget(housing)
-        layout.addWidget(EngineDebug())
+        layout.addWidget(EngineDebug("DylanBot", "5"))
         self.setLayout(layout)
 
 # Menu for the main gui
