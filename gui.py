@@ -46,6 +46,36 @@ for i in range(1, 9):
 _brdClrOne = QColor(207, 138, 70)
 _brdClrTwo = QColor(253, 204, 157)
 
+# Class for engine debug console
+class EngineDebug(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(int(_xDim), int(_yDim / 2))
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        title = self.createTitle()
+        layout.addWidget(title)
+        self.textBox = QLabel()
+        self.textBox.setStyleSheet("background-color: white;" "border: 2px solid grey;")
+        layout.addWidget(self.textBox)
+        self.updateText("Sample")
+        self.setLayout(layout)
+        self.setObjectName("frame");
+        self.setStyleSheet("#frame { border: 1px solid grey; }");
+
+    def updateText(self, debug):
+        currText = self.textBox.text()
+        self.textBox.setText(currText + debug)
+    
+    def createTitle(self):
+        header = QLabel()
+        font = header.font()
+        font.setPointSize(10)
+        header.setFont(font)
+        header.setText("Engine Debug:")
+        header.setFixedHeight(20)
+        return header
+
 # Class for move table
 class MoveList(QTableWidget):
     def __init__(self):
@@ -72,8 +102,7 @@ class MoveList(QTableWidget):
             itemTwo = QTableWidgetItem(move)
             itemTwo.setFlags(itemTwo.flags() & ~(Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
             self.setItem(rowNum, 1, itemTwo)
-        self.white = not self.white
-        
+        self.white = not self.white 
 
 
 # Class for chess board image
@@ -136,7 +165,7 @@ class WindowLayout(QWidget):
         housing = QWidget()
         housing.setLayout(topLayout)
         layout.addWidget(housing)
-        layout.addWidget(QWidget())
+        layout.addWidget(EngineDebug())
         self.setLayout(layout)
 
 # Menu for the main gui
