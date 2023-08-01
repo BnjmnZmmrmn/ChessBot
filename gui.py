@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import *
 import webbrowser
 
 # Dimensions for app size
-_xDim = 720 + 1
-_yDim = 720 + 26
+_xDim = 720
+_yDim = 720
 
 """       TEMP CODES:
            wr | br
@@ -45,14 +45,42 @@ for i in range(1, 9):
 # Colors for board
 _brdClrOne = QColor(207, 138, 70)
 _brdClrTwo = QColor(253, 204, 157)
-_pcClrOne = QColor(255, 255, 255)
-_pcClrTwo = QColor(0, 0, 0)
+
+# Class for move table
+class MoveList(QTableWidget):
+    def __init__(self):
+        super().__init__()
+        self.setFixedSize(int(_xDim / 2), int(_yDim / 2))
+        self.setRowCount(0)
+        self.setColumnCount(2)
+        self.setHorizontalHeaderLabels(['White', 'Black'])
+        self.white = True
+    
+    # Adds a move to the table
+    def addMoveToTable(self, move):
+        if self.white:
+            self.setRowCount(self.rowCount() + 1)
+            rowNum = self.rowCount() - 1
+            itemOne = QTableWidgetItem(move)
+            itemOne.setFlags(itemOne.flags() & ~(Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
+            itemTwo = QTableWidgetItem()
+            itemTwo.setFlags(itemTwo.flags() & ~(Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
+            self.setItem(rowNum, 0, itemOne)
+            self.setItem(rowNum, 1, itemTwo)
+        else:
+            rowNum = self.rowCount() - 1
+            itemTwo = QTableWidgetItem(move)
+            itemTwo.setFlags(itemTwo.flags() & ~(Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
+            self.setItem(rowNum, 1, itemTwo)
+        self.white = not self.white
+        
 
 
 # Class for chess board image
 class BoardImage(QWidget):
     def __init__(self):
         super().__init__()
+        self.setFixedSize(int(_xDim / 2), int(_yDim / 2))
 
     def paintEvent(self, event):
         squareSize = int(_xDim / 16)
@@ -98,13 +126,13 @@ class WindowLayout(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout()
-        layout.setSpacing(-0)
+        layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         topLayout = QHBoxLayout()
         topLayout.setSpacing(0)
         topLayout.setContentsMargins(0, 0, 0, 0)
         topLayout.addWidget(BoardImage())
-        topLayout.addWidget(QWidget()) 
+        topLayout.addWidget(MoveList()) 
         housing = QWidget()
         housing.setLayout(topLayout)
         layout.addWidget(housing)
