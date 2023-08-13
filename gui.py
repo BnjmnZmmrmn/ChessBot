@@ -21,32 +21,33 @@ _yDim = 720
 # Initialize board storage
 _pieceDict = {}
 for i in range(1, 9):
-    _pieceDict["b" + str(i)] = "wp"
-    _pieceDict["g" + str(i)] = "bp"
+    _pieceDict[chr(i + 96) + "2"] = "wp"
+    _pieceDict[chr(i + 96) + "7"] = "bp"
     if i == 1 or i == 8:
-        _pieceDict["a" + str(i)] = "wr"
-        _pieceDict["h" + str(i)] = "br"
+        _pieceDict[chr(i + 96) + "1"] = "wr"
+        _pieceDict[chr(i + 96) + "8"] = "br"
     if i == 2 or i == 7:
-        _pieceDict["a" + str(i)] = "wkn"
-        _pieceDict["h" + str(i)] = "bkn"
+        _pieceDict[chr(i + 96) + "1"] = "wkn"
+        _pieceDict[chr(i + 96) + "8"] = "bkn"
     if i == 3 or i == 6:
-        _pieceDict["a" + str(i)] = "wb"
-        _pieceDict["h" + str(i)] = "bb"
+        _pieceDict[chr(i + 96) + "1"] = "wb"
+        _pieceDict[chr(i + 96) + "8"] = "bb"
     if i == 4:
-        _pieceDict["a" + str(i)] = "wk"
-        _pieceDict["h" + str(i)] = "bq"
+        _pieceDict[chr(i + 96) + "1"] = "wk"
+        _pieceDict[chr(i + 96) + "8"] = "bq"
     if i == 5:
-        _pieceDict["a" + str(i)] = "wq"
-        _pieceDict["h" + str(i)] = "bk"
-    _pieceDict["c" + str(i)] = ""
-    _pieceDict["d" + str(i)] = ""
-    _pieceDict["e" + str(i)] = ""
-    _pieceDict["f" + str(i)] = ""
+        _pieceDict[chr(i + 96) + "1"] = "wq"
+        _pieceDict[chr(i + 96) + "8"] = "bk"
+    _pieceDict[chr(i + 96) + "3"] = ""
+    _pieceDict[chr(i + 96) + "4"] = ""
+    _pieceDict[chr(i + 96) + "5"] = ""
+    _pieceDict[chr(i + 96) + "6"] = ""
 
 
 # Colors for board
 _brdClrOne = QColor(207, 138, 70)
 _brdClrTwo = QColor(253, 204, 157)
+_brdClrClck = QColor(253, 0, 0)
 
 # Class for engine debug console
 class EngineDebug(QFrame):
@@ -129,12 +130,15 @@ class BoardImage(QWidget):
         for x in [squareSize * i for i in range(8)]:
             alt = not alt
             for y in [squareSize * i for i in range(8)]:
-                if not alt:
+                square = chr(int(x / squareSize) + 97) + str(8 - int(y / squareSize))
+                if self.prevClick == square:
+                    selfPainter.fillRect(x, y, squareSize, squareSize, _brdClrClck)
+                elif not alt:
                     selfPainter.fillRect(x, y, squareSize, squareSize, _brdClrOne)
                 else:
                     selfPainter.fillRect(x, y, squareSize, squareSize, _brdClrTwo)
                 alt = not alt
-                piece = _pieceDict[chr(7 - int(y / squareSize) + 97) + str(int(x / squareSize) + 1)]
+                piece = _pieceDict[square]
                 if piece == "wr":
                     selfPainter.drawImage(x, y, QImage('./assets/wr.png'))
                 elif piece == "br":
@@ -165,30 +169,45 @@ class BoardImage(QWidget):
         if event.button() == Qt.LeftButton:
             x = chr(97 + (event.x() // int(_xDim / 16)))
             y = 8 - (event.y() // int(_yDim / 16))
-            self.prevClick = x + str(y)
-            self.parent().parent().on_board_image_clicked(x + str(y))
+            newClick = x + str(y)
+            if self.prevClick != None and _pieceDict[self.prevClick] != "":
+                piece = _pieceDict[self.prevClick]
+                # validateMove(self.prevClick, x + str(y))
+                _pieceDict[self.prevClick] = ""
+                _pieceDict[newClick] = piece
+                self.prevClick = None
+            else:
+                self.prevClick = newClick
+            self.parent().parent().on_board_image_clicked(newClick)
 
 
 # Houses all compenents of the chess gui for the main window
 class WindowLayout(QWidget):
+    brdImg = None
+    mvLst = None
+    ngnDbg = None
+
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.brdImg = BoardImage()
+        self.mvLst = MoveList()
+        self.ngnDbg = EngineDebug("DylanBot", "5")
         layout = QVBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         topLayout = QHBoxLayout()
         topLayout.setSpacing(0)
         topLayout.setContentsMargins(0, 0, 0, 0)
-        topLayout.addWidget(BoardImage())
-        topLayout.addWidget(MoveList()) 
+        topLayout.addWidget(self.brdImg)
+        topLayout.addWidget(self.mvLst) 
         housing = QWidget()
         housing.setLayout(topLayout)
         layout.addWidget(housing)
-        layout.addWidget(EngineDebug("DylanBot", "5"))
+        layout.addWidget(self.ngnDbg)
         self.setLayout(layout)
     
     def on_board_image_clicked(self, loc):
-        print(loc)
+        self.brdImg.update()
 
 # Menu for the main gui
 class WindowMenu(QMenuBar):
