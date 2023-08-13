@@ -94,7 +94,6 @@ class MoveList(QTableWidget):
         self.setColumnCount(2)
         self.setHorizontalHeaderLabels(['White', 'Black'])
         self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.addMoveToTable("...")
     
     # Adds a move to the table
     def addMoveToTable(self, move):
@@ -176,9 +175,10 @@ class BoardImage(QWidget):
                 _pieceDict[self.prevClick] = ""
                 _pieceDict[newClick] = piece
                 self.prevClick = None
+                self.parent().parent().on_board_image_clicked(newClick, True)
             else:
                 self.prevClick = newClick
-            self.parent().parent().on_board_image_clicked(newClick)
+                self.parent().parent().on_board_image_clicked(newClick, False)
 
 
 # Houses all compenents of the chess gui for the main window
@@ -206,7 +206,11 @@ class WindowLayout(QWidget):
         layout.addWidget(self.ngnDbg)
         self.setLayout(layout)
     
-    def on_board_image_clicked(self, loc):
+    def on_board_image_clicked(self, loc, addMove):
+        if addMove:
+            piece = _pieceDict[loc]
+            self.mvLst.addMoveToTable(piece + " to " + loc)
+            self.ngnDbg.updateText("Good move!")
         self.brdImg.update()
 
 # Menu for the main gui
