@@ -20,28 +20,30 @@ _yDim = 720
 
 # Initialize board storage
 _pieceDict = {}
-for i in range(1, 9):
-    _pieceDict[chr(i + 96) + "2"] = "wp"
-    _pieceDict[chr(i + 96) + "7"] = "bp"
-    if i == 1 or i == 8:
-        _pieceDict[chr(i + 96) + "1"] = "wr"
-        _pieceDict[chr(i + 96) + "8"] = "br"
-    if i == 2 or i == 7:
-        _pieceDict[chr(i + 96) + "1"] = "wkn"
-        _pieceDict[chr(i + 96) + "8"] = "bkn"
-    if i == 3 or i == 6:
-        _pieceDict[chr(i + 96) + "1"] = "wb"
-        _pieceDict[chr(i + 96) + "8"] = "bb"
-    if i == 4:
-        _pieceDict[chr(i + 96) + "1"] = "wk"
-        _pieceDict[chr(i + 96) + "8"] = "bq"
-    if i == 5:
-        _pieceDict[chr(i + 96) + "1"] = "wq"
-        _pieceDict[chr(i + 96) + "8"] = "bk"
-    _pieceDict[chr(i + 96) + "3"] = ""
-    _pieceDict[chr(i + 96) + "4"] = ""
-    _pieceDict[chr(i + 96) + "5"] = ""
-    _pieceDict[chr(i + 96) + "6"] = ""
+def resetPieceDict():
+    for i in range(1, 9):
+        _pieceDict[chr(i + 96) + "2"] = "wp"
+        _pieceDict[chr(i + 96) + "7"] = "bp"
+        if i == 1 or i == 8:
+            _pieceDict[chr(i + 96) + "1"] = "wr"
+            _pieceDict[chr(i + 96) + "8"] = "br"
+        if i == 2 or i == 7:
+            _pieceDict[chr(i + 96) + "1"] = "wkn"
+            _pieceDict[chr(i + 96) + "8"] = "bkn"
+        if i == 3 or i == 6:
+            _pieceDict[chr(i + 96) + "1"] = "wb"
+            _pieceDict[chr(i + 96) + "8"] = "bb"
+        if i == 4:
+            _pieceDict[chr(i + 96) + "1"] = "wk"
+            _pieceDict[chr(i + 96) + "8"] = "bq"
+        if i == 5:
+            _pieceDict[chr(i + 96) + "1"] = "wq"
+            _pieceDict[chr(i + 96) + "8"] = "bk"
+        _pieceDict[chr(i + 96) + "3"] = ""
+        _pieceDict[chr(i + 96) + "4"] = ""
+        _pieceDict[chr(i + 96) + "5"] = ""
+        _pieceDict[chr(i + 96) + "6"] = ""
+resetPieceDict()
 
 
 # Colors for board
@@ -111,7 +113,7 @@ class MoveList(QTableWidget):
             itemTwo = QTableWidgetItem(move)
             itemTwo.setFlags(itemTwo.flags() & ~(Qt.ItemFlag.ItemIsEditable | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
             self.setItem(rowNum, 1, itemTwo)
-        self.white = not self.white 
+        self.white = not self.white
 
 
 # Class for chess board image
@@ -212,6 +214,13 @@ class WindowLayout(QWidget):
             self.mvLst.addMoveToTable(piece + " to " + loc)
             self.ngnDbg.updateText("Good move!")
         self.brdImg.update()
+    
+    def newGameTrigger(self):
+        resetPieceDict()
+        self.mvLst.clearContents()
+        self.mvLst.setRowCount(0)
+        self.brdImg.prevClick = None
+        self.brdImg.update()
 
 # Menu for the main gui
 class WindowMenu(QMenuBar):
@@ -226,8 +235,10 @@ class WindowMenu(QMenuBar):
         windowMenu = QMenu('Window', self)
         helpMenu = QMenu('Help', self)
         # Populate game menu
-        for _ in range(3):
-            gameMenu.addAction(QAction('**SAMPLE**', self))
+        gameOptions = [QAction('New Game', self)]
+        gameOptions[0].triggered.connect(self.newGameTrigger)
+        for gameOption in gameOptions:
+            gameMenu.addAction(gameOption)
         # Populate view menu
         for _ in range(3):
             viewMenu.addAction(QAction('**SAMPLE**', self))
@@ -248,16 +259,26 @@ class WindowMenu(QMenuBar):
         self.addMenu(engineMenu)
         self.addMenu(windowMenu)
         self.addMenu(helpMenu)
+
+    def newGameTrigger(self):
+        self.parent().newGameTrigger()
     
 # Main class for chess gui
 class Window(QMainWindow):
+    menu = None
+    widgets = None
 
     # Initializes the main window
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMenuBar(WindowMenu())
-        self.setCentralWidget(WindowLayout())
+        self.menu = WindowMenu()
+        self.widgets = WindowLayout()
+        self.setMenuBar(self.menu)
+        self.setCentralWidget(self.widgets)
         self.setWindowTitle('Hamuy-Zimmerman Bot')
+
+    def newGameTrigger(self):
+        self.widgets.newGameTrigger()
 
 # Creates an application with a window inside of it
 if __name__ == '__main__':
