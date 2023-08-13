@@ -172,15 +172,18 @@ class BoardImage(QWidget):
             y = 8 - (event.y() // int(_yDim / 16))
             newClick = x + str(y)
             if self.prevClick != None and _pieceDict[self.prevClick] != "":
+                takes = False
+                if _pieceDict[newClick] != "":
+                    takes = not takes
                 piece = _pieceDict[self.prevClick]
                 # validateMove(self.prevClick, x + str(y))
                 _pieceDict[self.prevClick] = ""
                 _pieceDict[newClick] = piece
                 self.prevClick = None
-                self.parent().parent().on_board_image_clicked(newClick, True)
+                self.parent().parent().on_board_image_clicked(newClick, True, takes)
             else:
                 self.prevClick = newClick
-                self.parent().parent().on_board_image_clicked(newClick, False)
+                self.parent().parent().on_board_image_clicked(newClick, False, False)
 
 
 # Houses all compenents of the chess gui for the main window
@@ -208,10 +211,25 @@ class WindowLayout(QWidget):
         layout.addWidget(self.ngnDbg)
         self.setLayout(layout)
     
-    def on_board_image_clicked(self, loc, addMove):
+    def on_board_image_clicked(self, loc, addMove, takes):
         if addMove:
             piece = _pieceDict[loc]
-            self.mvLst.addMoveToTable(piece + " to " + loc)
+            if piece == "wr" or piece == "br":
+                piece = "R"
+            elif piece == "wkn" or piece == "bkn":
+                piece = "N"
+            elif piece == "wb"or piece == "bb":
+                piece = "B"
+            elif piece == "wk" or piece == "bk":
+                piece = "K"
+            elif piece == "wq" or piece == "bq":
+                piece = "Q"
+            elif piece == "wp" or piece == "bp":
+                piece = "P"
+            if not takes:
+                self.mvLst.addMoveToTable(piece + loc)
+            else:
+                self.mvLst.addMoveToTable(piece + "x" + loc)
             self.ngnDbg.updateText("Good move!")
         self.brdImg.update()
     
