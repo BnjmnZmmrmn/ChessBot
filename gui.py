@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QMouseEvent
 import webbrowser
 import datetime
 
@@ -115,6 +116,8 @@ class MoveList(QTableWidget):
 
 # Class for chess board image
 class BoardImage(QWidget):
+    prevClick = None
+
     def __init__(self):
         super().__init__()
         self.setFixedSize(int(_xDim / 2), int(_yDim / 2))
@@ -158,6 +161,14 @@ class BoardImage(QWidget):
                     selfPainter.drawImage(x, y, QImage('./assets/bp.png'))
         selfPainter.drawRect(0, 0, squareSize * 8, squareSize * 8)
 
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            x = chr(97 + (event.x() // int(_xDim / 16)))
+            y = 8 - (event.y() // int(_yDim / 16))
+            self.prevClick = x + str(y)
+            self.parent().parent().on_board_image_clicked(x + str(y))
+
+
 # Houses all compenents of the chess gui for the main window
 class WindowLayout(QWidget):
     def __init__(self, parent=None):
@@ -175,9 +186,14 @@ class WindowLayout(QWidget):
         layout.addWidget(housing)
         layout.addWidget(EngineDebug("DylanBot", "5"))
         self.setLayout(layout)
+    
+    def on_board_image_clicked(self, loc):
+        print(loc)
 
 # Menu for the main gui
 class WindowMenu(QMenuBar):
+    prevClick = None
+
     def __init__(self, parent=None):
         super().__init__(parent)
         # Creates all submenus
