@@ -83,13 +83,16 @@ class EngineDebug(QFrame):
 
 # Class for move table
 class MoveList(QTableWidget):
+    white = True
+
     def __init__(self):
         super().__init__()
         self.setFixedSize(int(_xDim / 2), int(_yDim / 2))
         self.setRowCount(0)
         self.setColumnCount(2)
         self.setHorizontalHeaderLabels(['White', 'Black'])
-        self.white = True
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.addMoveToTable("...")
     
     # Adds a move to the table
     def addMoveToTable(self, move):
