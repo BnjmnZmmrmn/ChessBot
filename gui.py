@@ -34,10 +34,10 @@ def resetPieceDict():
             _pieceDict[chr(i + 96) + "1"] = "wb"
             _pieceDict[chr(i + 96) + "8"] = "bb"
         if i == 4:
-            _pieceDict[chr(i + 96) + "1"] = "wk"
+            _pieceDict[chr(i + 96) + "1"] = "wq"
             _pieceDict[chr(i + 96) + "8"] = "bq"
         if i == 5:
-            _pieceDict[chr(i + 96) + "1"] = "wq"
+            _pieceDict[chr(i + 96) + "1"] = "wk"
             _pieceDict[chr(i + 96) + "8"] = "bk"
         _pieceDict[chr(i + 96) + "3"] = ""
         _pieceDict[chr(i + 96) + "4"] = ""
